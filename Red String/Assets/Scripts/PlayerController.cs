@@ -18,13 +18,24 @@ public class PlayerController : MonoBehaviour {
     public bool isGrounded;
     public LayerMask whatIsGround;
 
+    private Animator animator;
+    public bool faceRight;
+
     // Use this for initialization
     void Start () {
-         rb = GetComponent<Rigidbody2D>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        rb = GetComponent<Rigidbody2D>();
+        animator = this.GetComponent<Animator>();
+    }
+
+    void Flip()
+    {
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
+
+    // Update is called once per frame
+    void Update () {
 
         isGrounded = Physics2D.OverlapCircle(
             groundCheckPoint.position, 
@@ -35,12 +46,24 @@ public class PlayerController : MonoBehaviour {
 		if (Input.GetKey(left))
         {
             rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
+
+            animator.SetBool("Left", true);
+            if (faceRight)
+                Flip();
+            faceRight = false;
         } else if (Input.GetKey(right))
         {
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+
+            animator.SetBool("Right", true);
+            if (!faceRight)
+                Flip();
+            faceRight = true;
         } else
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
+            animator.SetBool("Left", false);
+            animator.SetBool("Right", false);
         }
 
         if (Input.GetKeyDown(jump) && isGrounded)
