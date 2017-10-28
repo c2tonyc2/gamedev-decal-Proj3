@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
@@ -23,6 +24,6 @@ public class CameraController : MonoBehaviour {
 	void LateUpdate () 
 	{
 		// Set the position of the camera's transform to be the same as the player's, but offset by the calculated offset distance.
-		transform.position = new Vector3(player.transform.position.x, 0 , 0)+ offset;
+		transform.position = new Vector3(player.transform.position.x, 0 , 0) + offset;
 	}
 }

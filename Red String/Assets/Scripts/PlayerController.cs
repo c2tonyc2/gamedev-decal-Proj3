@@ -19,17 +19,19 @@ public class PlayerController : MonoBehaviour {
     public LayerMask whatIsGround;
 
     private Animator animator;
+    private Vector3 theScale;
     public bool faceRight;
 
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody2D>();
         animator = this.GetComponent<Animator>();
+
+        theScale = transform.localScale;
     }
 
     void Flip()
     {
-        Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
     }
