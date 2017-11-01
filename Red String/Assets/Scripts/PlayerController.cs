@@ -7,7 +7,8 @@ public class PlayerController : MonoBehaviour {
 	public GameObject soulMate;
 	private Rigidbody2D soulMateRb;
 
-    public float moveSpeed;
+    public float moveForce;
+	public float maxSpeed;
     public float jumpForce;
 
     public KeyCode left;
@@ -54,18 +55,20 @@ public class PlayerController : MonoBehaviour {
             whatIsGround
         );
 
+		if (rb.velocity.x < maxSpeed)
+			rb.AddForce(Vector2.right * moveForce);
+
+		if (Mathf.Abs (rb.velocity.x) > maxSpeed)
+			rb.velocity = new Vector2(Mathf.Sign (rb.velocity.x) * maxSpeed, rb.velocity.y);
+
 		if (Input.GetKey(left))
         {
-            rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
-
             animator.SetBool("Left", true);
             if (faceRight)
                 Flip();
             faceRight = false;
         } else if (Input.GetKey(right))
         {
-            rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-
             animator.SetBool("Right", true);
             if (!faceRight)
                 Flip();
