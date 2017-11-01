@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
     public Rigidbody2D rb;
+	public GameObject soulMate;
+	private Rigidbody2D soulMateRb;
 
     public float moveSpeed;
     public float jumpForce;
@@ -22,12 +24,19 @@ public class PlayerController : MonoBehaviour {
     private Vector3 theScale;
     public bool faceRight;
 
+	public float tugForce;
+	public float tugCooldown;
+	public float tugTime;
+
     // Use this for initialization
     void Start () {
-        rb = GetComponent<Rigidbody2D>();
-        animator = this.GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D> ();
+		soulMateRb = soulMate.GetComponent<Rigidbody2D> ();
+        animator = this.GetComponent<Animator> ();
 
         theScale = transform.localScale;
+
+		tugTime = Time.time;
     }
 
     void Flip()
@@ -61,12 +70,23 @@ public class PlayerController : MonoBehaviour {
             if (!faceRight)
                 Flip();
             faceRight = true;
-        } else
-        {
-            rb.velocity = new Vector2(0, rb.velocity.y);
-            animator.SetBool("Left", false);
-            animator.SetBool("Right", false);
         }
+//		else
+//        {
+//            rb.velocity = new Vector2(0, rb.velocity.y);
+//            animator.SetBool("Left", false);
+//            animator.SetBool("Right", false);
+//        }
+
+		if (Input.GetKeyDown (tug) && tugTime < Time.time)
+		{
+			Vector2 tugDirection = new Vector2 (
+				                       transform.position.x - soulMate.transform.position.x,
+				                       transform.position.y - soulMate.transform.position.y
+			                       );
+			soulMate.GetComponent<Rigidbody2D> ().AddForce (tugDirection * tugForce);
+			tugTime += tugCooldown;
+		}
 
         if (Input.GetKeyDown(jump) && isGrounded)
         {
