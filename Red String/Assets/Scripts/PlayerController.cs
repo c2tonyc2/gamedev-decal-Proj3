@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour {
 		tugTime = Time.time;
 		currentTugForce = 0;
 		maxTugForce = 400;
-		incrementTugForce = 20;
+		incrementTugForce = 10;
 
 		moveForce = 200;
 		jumpForce = 17;
