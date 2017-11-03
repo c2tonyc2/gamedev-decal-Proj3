@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
     public Rigidbody2D rb;
+	public GameObject soulMate;
+	private Rigidbody2D soulMateRb;
 
-    public float moveSpeed;
-    public float jumpForce;
+	private float moveForce;
+	private float maxHorizontalSpeed;
+	private float maxVerticalSpeed;
+	private float jumpForce;
 
-    public KeyCode left;
-    public KeyCode right;
     public KeyCode jump;
     public KeyCode tug;
+	public string horizontalAxis;
 
     public Transform groundCheckPoint;
     public float groundCheckRadius;
@@ -22,12 +25,29 @@ public class PlayerController : MonoBehaviour {
     private Vector3 theScale;
     public bool faceRight;
 
+	private float maxTugForce;
+	private float currentTugForce;
+	private float incrementTugForce;
+	public float tugCooldown;
+	private float tugTime;
+
     // Use this for initialization
     void Start () {
-        rb = GetComponent<Rigidbody2D>();
-        animator = this.GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D> ();
+		soulMateRb = soulMate.GetComponent<Rigidbody2D> ();
+        animator = this.GetComponent<Animator> ();
 
         theScale = transform.localScale;
+
+		tugTime = Time.time;
+		currentTugForce = 0;
+		maxTugForce = 400;
+		incrementTugForce = 10;
+
+		moveForce = 200;
+		jumpForce = 17;
+		maxHorizontalSpeed = 5;
+		maxVerticalSpeed = 20;
     }
 
     void Flip()
@@ -37,39 +57,71 @@ public class PlayerController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update () 
+	{
         isGrounded = Physics2D.OverlapCircle(
             groundCheckPoint.position, 
             groundCheckRadius, 
             whatIsGround
         );
 
-		if (Input.GetKey(left))
-        {
-            rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
+		if (Input.GetKey (tug) && tugTime < Time.time) {
+			currentTugForce += incrementTugForce;
+		} else if (Input.GetKeyUp (tug) && tugTime < Time.time)
+		{
+			Vector2 tugDirection = new Vector2 (
+				transform.position.x - soulMate.transform.position.x,
+				transform.position.y - soulMate.transform.position.y
+			);
+			soulMate.GetComponent<Rigidbody2D> ().AddForce (tugDirection * Mathf.Min(currentTugForce, maxTugForce));
 
-            animator.SetBool("Left", true);
-            if (faceRight)
-                Flip();
-            faceRight = false;
-        } else if (Input.GetKey(right))
-        {
-            rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-
-            animator.SetBool("Right", true);
-            if (!faceRight)
-                Flip();
-            faceRight = true;
-        } else
-        {
-            rb.velocity = new Vector2(0, rb.velocity.y);
-            animator.SetBool("Left", false);
-            animator.SetBool("Right", false);
-        }
+			tugTime += tugCooldown;
+			currentTugForce = 0;
+		}
 
         if (Input.GetKeyDown(jump) && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
+	}
+
+	void FixedUpdate()
+	{
+		float x = Input.GetAxis (horizontalAxis);
+
+		if (x * rb.velocity.x < maxHorizontalSpeed)
+		{
+			rb.AddForce (Vector2.right * x * moveForce);
+		}
+
+		if (Mathf.Abs (rb.velocity.x) > maxHorizontalSpeed) 
+		{
+			rb.velocity = new Vector2 (maxHorizontalSpeed * Mathf.Sign (rb.velocity.x) , rb.velocity.y);
+		}
+
+		if (Mathf.Abs (rb.velocity.y) > maxVerticalSpeed) 
+		{
+			rb.velocity = new Vector2 (rb.velocity.x, maxVerticalSpeed * Mathf.Sign (rb.velocity.y));
+		}
+
+		if (x < 0)
+		{
+			animator.SetBool("Left", true);
+			if (faceRight)
+				Flip();
+			faceRight = false;
+		} else if (x > 0)
+		{
+			animator.SetBool("Right", true);
+			if (!faceRight)
+				Flip();
+			faceRight = true;
+		}
+
+		if (rb.velocity.x == 0) {
+			animator.SetBool ("Right", false);
+			animator.SetBool ("Left", false);
+		}
+
 	}
 }
