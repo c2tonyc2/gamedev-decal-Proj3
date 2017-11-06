@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 	public float staggerForce = 1000.0f;
+	public int dropThreshold = -20;
 
     public Rigidbody2D rb;
 	public GameObject soulMate;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour {
 	private float tugTime;
 
 	private bool invincible;
+	private Vector3 lastPosition;
 
     // Use this for initialization
     void Start () {
@@ -89,6 +91,11 @@ public class PlayerController : MonoBehaviour {
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
+
+		// remember last grounded position for respawn
+		if (isGrounded) {
+			lastPosition = transform.position;
+		}
 	}
 
 	void FixedUpdate()
@@ -124,6 +131,14 @@ public class PlayerController : MonoBehaviour {
 			animator.SetBool ("Right", false);
 			animator.SetBool ("Left", false);
 		}
+		// dropping respawn
+		if (transform.position.y < dropThreshold) {
+			// how to get a good respawn position?
+			transform.position = lastPosition + new Vector3(0, 1, 0);
+			rb.velocity = new Vector2 (0, 0);
+			invincible = true;
+			Invoke("resetInvincibility", 1);
+		}
 
 	}
 
@@ -147,4 +162,6 @@ public class PlayerController : MonoBehaviour {
 	{
 		invincible = false;
 	}
+
+
 }
