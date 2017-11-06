@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-	public float staggerForce = 1000.0f;
+	public float staggerForce = 300.0f;
 	public int dropThreshold = -20;
 
     public Rigidbody2D rb;
@@ -151,7 +151,8 @@ public class PlayerController : MonoBehaviour {
 				invincible = true;
 				Vector2 dir = collision.contacts[0].point - new Vector2(transform.position.x, transform.position.y);
 				dir = -dir.normalized;
-				print (dir * staggerForce);
+//				print ("Im invincible");
+//				print (staggerForce);
 				rb.AddForce(dir * staggerForce);
 				Invoke("resetInvincibility", 1);
 			}
