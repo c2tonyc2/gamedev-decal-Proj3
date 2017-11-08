@@ -65,9 +65,10 @@ public class PlayerController : MonoBehaviour {
             whatIsGround
         );
 
-		if (Input.GetKey (tug) && tugTime < Time.time) {
+		if (currentTugForce < maxTugForce && Input.GetKey (tug) && tugTime < Time.time) {
 			currentTugForce += incrementTugForce;
-		} else if (Input.GetKeyUp (tug) && tugTime < Time.time)
+			maxHorizontalSpeed = 5 * (1 - currentTugForce/maxTugForce);
+		} else if ((currentTugForce > maxTugForce || Input.GetKeyUp (tug)) && tugTime < Time.time)
 		{
 			Vector2 tugDirection = new Vector2 (
 				transform.position.x - soulMate.transform.position.x,
@@ -77,6 +78,7 @@ public class PlayerController : MonoBehaviour {
 
 			tugTime += tugCooldown;
 			currentTugForce = 0;
+			maxHorizontalSpeed = 5;
 		}
 
         if (Input.GetKeyDown(jump) && isGrounded)
