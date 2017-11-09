@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
+	public float staggerForce = 300.0f;
+	public int dropThreshold = -20;
+
     public Rigidbody2D rb;
 	public GameObject soulMate;
 	private Rigidbody2D soulMateRb;
@@ -31,6 +34,9 @@ public class PlayerController : MonoBehaviour {
 	public float tugCooldown;
 	private float tugTime;
 
+	private bool invincible;
+	private Vector3 lastPosition;
+
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody2D> ();
@@ -48,6 +54,8 @@ public class PlayerController : MonoBehaviour {
 		jumpForce = 17;
 		maxHorizontalSpeed = 5;
 		maxVerticalSpeed = 20;
+
+		invincible = false;
     }
 
     void Flip()
@@ -85,45 +93,78 @@ public class PlayerController : MonoBehaviour {
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
+
+		// remember last grounded position for respawn
+		if (isGrounded) {
+			lastPosition = transform.position;
+		}
 	}
 
 	void FixedUpdate()
 	{
 		float x = Input.GetAxis (horizontalAxis);
 
-		if (x * rb.velocity.x < maxHorizontalSpeed)
-		{
-			rb.AddForce (Vector2.right * x * moveForce);
-		}
+		if (!invincible) {
+			if (x * rb.velocity.x < maxHorizontalSpeed) {
+				rb.AddForce (Vector2.right * x * moveForce);
+			}
 
-		if (Mathf.Abs (rb.velocity.x) > maxHorizontalSpeed) 
-		{
-			rb.velocity = new Vector2 (maxHorizontalSpeed * Mathf.Sign (rb.velocity.x) , rb.velocity.y);
-		}
+			if (Mathf.Abs (rb.velocity.x) > maxHorizontalSpeed) {
+				rb.velocity = new Vector2 (maxHorizontalSpeed * Mathf.Sign (rb.velocity.x), rb.velocity.y);
+			}
 
-		if (Mathf.Abs (rb.velocity.y) > maxVerticalSpeed) 
-		{
-			rb.velocity = new Vector2 (rb.velocity.x, maxVerticalSpeed * Mathf.Sign (rb.velocity.y));
-		}
+			if (Mathf.Abs (rb.velocity.y) > maxVerticalSpeed) {
+				rb.velocity = new Vector2 (rb.velocity.x, maxVerticalSpeed * Mathf.Sign (rb.velocity.y));
+			}
 
-		if (x < 0)
-		{
-			animator.SetBool("Left", true);
-			if (faceRight)
-				Flip();
-			faceRight = false;
-		} else if (x > 0)
-		{
-			animator.SetBool("Right", true);
-			if (!faceRight)
-				Flip();
-			faceRight = true;
+			if (x < 0) {
+				animator.SetBool ("Left", true);
+				if (faceRight)
+					Flip ();
+				faceRight = false;
+			} else if (x > 0) {
+				animator.SetBool ("Right", true);
+				if (!faceRight)
+					Flip ();
+				faceRight = true;
+			}
 		}
-
 		if (rb.velocity.x == 0) {
 			animator.SetBool ("Right", false);
 			animator.SetBool ("Left", false);
 		}
+		// dropping respawn
+		if (transform.position.y < dropThreshold) {
+			// how to get a good respawn position?
+			transform.position = lastPosition + new Vector3(0, 1, 0);
+			rb.velocity = new Vector2 (0, 0);
+			invincible = true;
+			Invoke("resetInvincibility", 1);
+		}
 
 	}
+
+	void OnCollisionEnter2D(Collision2D collision)
+	{
+		if (!invincible)
+		{
+			if (collision.gameObject.layer == 10)
+			{
+				invincible = true;
+				Vector2 dir = collision.contacts[0].point - new Vector2(transform.position.x, transform.position.y);
+				dir = -dir.normalized;
+//				print ("Im invincible");
+//				print (staggerForce);
+				rb.AddForce(dir * staggerForce);
+				Invoke("resetInvincibility", 1);
+			}
+		}
+	}
+
+	void resetInvincibility()
+	{
+		invincible = false;
+	}
+
+
 }
