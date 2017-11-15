@@ -121,8 +121,18 @@ public class PlayerController : MonoBehaviour {
 				rb.velocity = new Vector2 (rb.velocity.x, maxVerticalSpeed * Mathf.Sign (rb.velocity.y));
 			}
 
-			if (x < 0) {
-				animator.SetBool ("Left", true);
+            //check if jumping
+            if (isGrounded) {
+                animator.SetBool("onGround", true);
+            }
+            else
+            {
+                animator.SetBool("onGround", false);
+            }
+
+            //checking for movement
+            if (x < 0) {
+                animator.SetBool ("Left", true);
 				if (faceRight)
 					Flip ();
 				faceRight = false;
