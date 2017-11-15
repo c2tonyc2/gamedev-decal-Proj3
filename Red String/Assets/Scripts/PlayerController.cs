@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour {
     private Vector3 theScale;
     public bool faceRight;
 
+	private float pseudoX;
 	private float maxTugForce;
 	private float currentTugForce;
 	private float incrementTugForce;
@@ -45,13 +46,14 @@ public class PlayerController : MonoBehaviour {
 
         theScale = transform.localScale;
 
+		pseudoX = 20;
 		tugTime = Time.time;
 		currentTugForce = 0;
-		maxTugForce = 400;
-		incrementTugForce = 10;
+		maxTugForce = 6000;
+		incrementTugForce = 70;
 
 		moveForce = 200;
-		jumpForce = 17;
+		jumpForce = 18;
 		maxHorizontalSpeed = 5;
 		maxVerticalSpeed = 20;
 
@@ -76,13 +78,15 @@ public class PlayerController : MonoBehaviour {
 		if (currentTugForce < maxTugForce && Input.GetKey (tug) && tugTime < Time.time) {
 			currentTugForce += incrementTugForce;
 			maxHorizontalSpeed = 5 * (1 - currentTugForce/maxTugForce);
-		} else if ((currentTugForce > maxTugForce || Input.GetKeyUp (tug)) && tugTime < Time.time)
+		} else if (Input.GetKeyUp (tug) && tugTime < Time.time)
 		{
 			Vector2 tugDirection = new Vector2 (
 				transform.position.x - soulMate.transform.position.x,
 				transform.position.y - soulMate.transform.position.y
 			);
-			soulMate.GetComponent<Rigidbody2D> ().AddForce (tugDirection * Mathf.Min(currentTugForce, maxTugForce));
+			tugDirection.x = pseudoX * Mathf.Sign (tugDirection.x);
+
+			soulMateRb.AddForce (tugDirection.normalized * Mathf.Min(currentTugForce, maxTugForce));
 
 			tugTime += tugCooldown;
 			currentTugForce = 0;
@@ -117,8 +121,18 @@ public class PlayerController : MonoBehaviour {
 				rb.velocity = new Vector2 (rb.velocity.x, maxVerticalSpeed * Mathf.Sign (rb.velocity.y));
 			}
 
-			if (x < 0) {
-				animator.SetBool ("Left", true);
+            //check if jumping
+            if (isGrounded) {
+                animator.SetBool("onGround", true);
+            }
+            else
+            {
+                animator.SetBool("onGround", false);
+            }
+
+            //checking for movement
+            if (x < 0) {
+                animator.SetBool ("Left", true);
 				if (faceRight)
 					Flip ();
 				faceRight = false;
