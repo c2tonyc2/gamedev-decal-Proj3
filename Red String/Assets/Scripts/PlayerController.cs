@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // Required when Using UI elements.
 
 public class PlayerController : MonoBehaviour {
 	public float staggerForce = 300.0f;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour {
 	private float incrementTugForce;
 	public float tugCooldown;
 	private float tugTime;
+	public Image tugBar;
 
 	private bool invincible;
 	private Vector3 lastPosition;
@@ -69,6 +71,7 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update () 
 	{
+		tugBar.fillAmount = currentTugForce / maxTugForce;
         isGrounded = Physics2D.OverlapCircle(
             groundCheckPoint.position, 
             groundCheckRadius, 
