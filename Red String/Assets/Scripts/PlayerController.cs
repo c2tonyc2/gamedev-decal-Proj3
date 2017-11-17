@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 	public float staggerForce = 300.0f;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour {
 	private float incrementTugForce;
 	public float tugCooldown;
 	private float tugTime;
+	public Image tugBar;
 
 	private bool invincible;
 	private Vector3 lastPosition;
@@ -69,6 +71,7 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update () 
 	{
+		tugBar.fillAmount = Mathf.Min(1, currentTugForce / maxTugForce);
         isGrounded = Physics2D.OverlapCircle(
             groundCheckPoint.position, 
             groundCheckRadius, 
@@ -86,7 +89,7 @@ public class PlayerController : MonoBehaviour {
 			);
 			tugDirection.x = pseudoX * Mathf.Sign (tugDirection.x);
 
-			soulMateRb.AddForce (tugDirection.normalized * Mathf.Min(currentTugForce, maxTugForce));
+			soulMateRb.AddForce (5 * tugDirection.normalized * Mathf.Min(currentTugForce, maxTugForce));
 
 			tugTime += tugCooldown;
 			currentTugForce = 0;
