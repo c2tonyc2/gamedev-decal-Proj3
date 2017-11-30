@@ -14,18 +14,20 @@ public class Minimap : MonoBehaviour {
 	public RectTransform Goal1UI;
 	public RectTransform Goal2UI;
 
-	private float world2UI;
+	private float P1world2UI;
+	private float P2world2UI;
 
 	// Use this for initialization
 	void Start () {
-		float realDistance = Mathf.Abs (GoalPost1.transform.position.x) + Mathf.Abs (GoalPost2.transform.position.x);
-		float UIdistance = Mathf.Abs (Goal1UI.anchoredPosition.x) + Mathf.Abs (Goal2UI.anchoredPosition.x);
-		world2UI = UIdistance / realDistance;
+		float dist1 = Mathf.Abs (Mathf.Abs (GoalPost1.transform.position.x) - Mathf.Abs (Player1.transform.position.x));
+		float dist2 = Mathf.Abs (Mathf.Abs (GoalPost2.transform.position.x) - Mathf.Abs (Player2.transform.position.x));
+		P1world2UI = Mathf.Abs (Goal1UI.anchoredPosition.x) / Mathf.Abs (dist1);
+		P2world2UI = Mathf.Abs (Goal2UI.anchoredPosition.x) / Mathf.Abs (dist2);
 	}
 
 	// Update is called once per frame
 	void Update () {
-		Player1UI.anchoredPosition = new Vector2 (Player1.transform.position.x * world2UI, Goal1UI.anchoredPosition.y);
-		Player2UI.anchoredPosition = new Vector2 (Player2.transform.position.x * world2UI, Goal2UI.anchoredPosition.y);
+		Player1UI.anchoredPosition = new Vector2 (Player1.transform.position.x * P1world2UI, Player1UI.anchoredPosition.y);
+		Player2UI.anchoredPosition = new Vector2 (Player2.transform.position.x * P2world2UI, Player2UI.anchoredPosition.y);
 	}
 }

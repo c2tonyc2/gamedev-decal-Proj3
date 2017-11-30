@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour {
 	public float tugCooldown;
 	private float tugTime;
 	public Image tugBar;
+	public Image tugCoolingBar;
 
 	private bool invincible;
 	public float invincibleDuration;
@@ -72,6 +73,10 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update () 
 	{
+		if (tugTime < Time.time) {
+			changeTugAlpha (1f);
+		}
+
 		tugBar.fillAmount = Mathf.Min(1, currentTugForce / maxTugForce);
         isGrounded = Physics2D.OverlapCircle(
             groundCheckPoint.position, 
@@ -94,6 +99,8 @@ public class PlayerController : MonoBehaviour {
 			soulMateRb.AddForce (5 * tugDirection.normalized * Mathf.Min(currentTugForce, maxTugForce));
 
 			tugTime += tugCooldown;
+			changeTugAlpha (0.5f);
+
 			currentTugForce = 0;
 			maxHorizontalSpeed = 5;
 		}
@@ -202,5 +209,10 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-
+	void changeTugAlpha(float newAlpha) {
+		Color modified = tugCoolingBar.color;
+		modified.a = newAlpha;
+		tugCoolingBar.color = modified;
+	}
+		
 }
