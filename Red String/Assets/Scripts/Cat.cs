@@ -39,7 +39,7 @@ public class Cat : MonoBehaviour {
 			groundCheckRadius, 
 			whatIsGround
 		);
-		print (isGrounded);
+//		print (isGrounded);
 		// raycast forward or check distance to player
 		float p1Dist = Vector3.Distance(player1.transform.position, gameObject.transform.position);
 		float p2Dist = Vector3.Distance(player2.transform.position, gameObject.transform.position);

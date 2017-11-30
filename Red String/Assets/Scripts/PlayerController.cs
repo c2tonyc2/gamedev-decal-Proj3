@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour {
 	public Image tugBar;
 
 	private bool invincible;
+	public float invincibleDuration;
 	private Vector3 lastPosition;
 
     // Use this for initialization
@@ -156,8 +157,7 @@ public class PlayerController : MonoBehaviour {
 			// how to get a good respawn position?
 			transform.position = lastPosition + new Vector3(0, 1, 0);
 			rb.velocity = new Vector2 (0, 0);
-			invincible = true;
-			Invoke("resetInvincibility", 1);
+			startInvincible ();
 		}
 
 	}
@@ -168,18 +168,38 @@ public class PlayerController : MonoBehaviour {
 		{
 			if (collision.gameObject.layer == 10)
 			{
-				invincible = true;
 				Vector2 dir = collision.contacts[0].point - new Vector2(transform.position.x, transform.position.y);
 				dir = -dir.normalized;
 				rb.AddForce(dir * staggerForce);
-				Invoke("resetInvincibility", 1);
+				startInvincible ();
 			}
 		}
 	}
 
-	void resetInvincibility()
+	void startInvincible()
+	{
+		StopAllCoroutines ();
+		invincible = true;
+		Invoke("endInvincibility", invincibleDuration);
+		StartCoroutine(FlashSprite());
+	}
+
+	void endInvincibility()
 	{
 		invincible = false;
+		StopAllCoroutines();
+		GetComponent<SpriteRenderer> ().enabled = true;
+	}
+
+	IEnumerator FlashSprite()
+	{
+		while(true)
+		{
+			GetComponent<SpriteRenderer> ().enabled = false;
+			yield return new WaitForSeconds(.02f);
+			GetComponent<SpriteRenderer> ().enabled = true;
+			yield return new WaitForSeconds(.02f);
+		}
 	}
 
 
