@@ -51,8 +51,8 @@ public class PlayerController : MonoBehaviour {
 		pseudoX = 20;
 		tugTime = Time.time;
 		currentTugForce = 0;
-		maxTugForce = 6000;
-		incrementTugForce = 70;
+		maxTugForce = 20000;
+		incrementTugForce = 200;
 
 		moveForce = 200;
 		jumpForce = 18;
@@ -77,6 +77,7 @@ public class PlayerController : MonoBehaviour {
             groundCheckRadius, 
             whatIsGround
         );
+		print (isGrounded);
 
 		if (currentTugForce < maxTugForce && Input.GetKey (tug) && tugTime < Time.time) {
 			currentTugForce += incrementTugForce;
@@ -170,8 +171,6 @@ public class PlayerController : MonoBehaviour {
 				invincible = true;
 				Vector2 dir = collision.contacts[0].point - new Vector2(transform.position.x, transform.position.y);
 				dir = -dir.normalized;
-//				print ("Im invincible");
-//				print (staggerForce);
 				rb.AddForce(dir * staggerForce);
 				Invoke("resetInvincibility", 1);
 			}
