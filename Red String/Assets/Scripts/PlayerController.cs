@@ -110,6 +110,7 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetKeyDown(jump) && isGrounded)
         {
+			GetComponent<AudioSource> ().Play ();
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
